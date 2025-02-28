@@ -37,14 +37,14 @@ public class QRKoder extends JFrame {
             public void focusGained(FocusEvent e) {
                 if (metinAlani.getText().equals("Link veya metin giriniz")) {
                     metinAlani.setText("");
-                    metinAlani.setForeground(Color.WHITE);
+                    metinAlani.setForeground(Color.BLACK);
                 }
             }
             @Override
             public void focusLost(FocusEvent e) {
                 if (metinAlani.getText().isEmpty()) {
                     metinAlani.setText("Link veya metin giriniz");
-                    metinAlani.setForeground(Color.WHITE);
+                    metinAlani.setForeground(Color.BLACK);
                 }
             }
         });
