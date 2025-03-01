@@ -1,59 +1,60 @@
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.*;
+import com.google.zxing.client.j2se.*;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-
+import com.google.zxing.common.HybridBinarizer;
+import javax.imageio.ImageIO;
+import java.awt.Dimension;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.File;
 
 public class QRKoder extends JFrame {
     private JTextField metinAlani;
     private JLabel qrGoster;
-    private JButton uretDugme, kaydetDugme;
+    private JButton uretDugme, kaydetDugme, okuDugme;
 
     public QRKoder() {
         setTitle("QRKoder");
         setSize(500, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
-        setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
         metinAlani = new JTextField(20);
         metinAlani.setText("Link veya metin giriniz");
         metinAlani.setForeground(Color.GRAY);
-        metinAlani.setOpaque(false);
-        metinAlani.setBackground(new Color(255, 255, 255, 100));
         metinAlani.addFocusListener(new FocusListener() {
-            @Override
             public void focusGained(FocusEvent e) {
                 if (metinAlani.getText().equals("Link veya metin giriniz")) {
                     metinAlani.setText("");
                     metinAlani.setForeground(Color.BLACK);
                 }
             }
-            @Override
             public void focusLost(FocusEvent e) {
                 if (metinAlani.getText().isEmpty()) {
                     metinAlani.setText("Link veya metin giriniz");
+<<<<<<< HEAD
+                    metinAlani.setForeground(Color.GRAY);
+=======
                     metinAlani.setForeground(Color.BLACK);
+>>>>>>> 457d4240af5a255cf930239816fbe95bce3e2956
                 }
             }
         });
+
         uretDugme = new JButton("ÜRET");
+        kaydetDugme = new JButton("KAYDET");
+        okuDugme = new JButton("QR OKU");
         dugmeStili(uretDugme);
+        dugmeStili(kaydetDugme);
+        dugmeStili(okuDugme);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
         add(metinAlani, gbc);
 
         gbc.gridx = 1;
@@ -68,39 +69,23 @@ public class QRKoder extends JFrame {
         gbc.gridwidth = 2;
         add(qrGoster, gbc);
 
-        kaydetDugme = new JButton("KAYDET");
-        dugmeStili(kaydetDugme);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
+        gbc.gridy = 3;
         add(kaydetDugme, gbc);
 
-        uretDugme.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                qrKodUret();
-            }
-        });
+        gbc.gridy = 5;
+        add(okuDugme, gbc);
 
-        kaydetDugme.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                qrKodKaydet();
-            }
-        });
+        uretDugme.addActionListener(e -> qrKodUret());
+        kaydetDugme.addActionListener(e -> qrKodKaydet());
+        okuDugme.addActionListener(e -> qrKodOku());
     }
 
     private void qrKodUret() {
         try {
             String metin = metinAlani.getText();
             if (metin.equals("Link veya metin giriniz")) return;
-            int genislik = 300;
-            int yukseklik = 300;
-
-            BitMatrix bitMatrisi = new MultiFormatWriter().encode(metin, BarcodeFormat.QR_CODE, genislik, yukseklik);
+            BitMatrix bitMatrisi = new MultiFormatWriter().encode(metin, BarcodeFormat.QR_CODE, 300, 300);
             BufferedImage qrGoruntu = MatrixToImageWriter.toBufferedImage(bitMatrisi);
-
             qrGoster.setIcon(new ImageIcon(qrGoruntu));
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "QR Kod oluşturulamadı!", "Hata", JOptionPane.ERROR_MESSAGE);
@@ -110,31 +95,44 @@ public class QRKoder extends JFrame {
     private void qrKodKaydet() {
         try {
             String metin = metinAlani.getText();
-            int genislik = 300;
-            int yukseklik = 300;
-            BitMatrix bitMatrisi = new MultiFormatWriter().encode(metin, BarcodeFormat.QR_CODE, genislik, yukseklik);
-
-            Path exeDizini = Paths.get(new File(".").getAbsolutePath()).normalize();
-            Path dosyaYolu = exeDizini.resolve("qrcode.png");
+            BitMatrix bitMatrisi = new MultiFormatWriter().encode(metin, BarcodeFormat.QR_CODE, 300, 300);
+            Path dosyaYolu = Paths.get("qrcode.png");
             MatrixToImageWriter.writeToPath(bitMatrisi, "PNG", dosyaYolu);
-
-            JOptionPane.showMessageDialog(this, "QR Kod kaydedildi: " + dosyaYolu.toAbsolutePath(), "Başarılı", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "QR Kod kaydedildi!", "Başarılı", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "QR Kod kaydedilemedi!", "Hata", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void dugmeStili(JButton dugme) {
-        dugme.setBackground(new Color(50, 150, 250, 150));
-        dugme.setForeground(Color.WHITE);
-        dugme.setFocusPainted(false);
-        dugme.setFont(new Font("Arial", Font.BOLD, 16));
-        dugme.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+    private void qrKodOku() {
+        try {
+            JFileChooser dosyaSecici = new JFileChooser();
+            if (dosyaSecici.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File secilenDosya = dosyaSecici.getSelectedFile();
+                BufferedImage qrGoruntu = ImageIO.read(secilenDosya);
+                LuminanceSource kaynak = new BufferedImageLuminanceSource(qrGoruntu);
+                BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(kaynak));
+                Result sonuc = new MultiFormatReader().decode(bitmap);
+                JOptionPane.showMessageDialog(this, "QR İçeriği: " + sonuc.getText(), "QR Okundu", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "QR Kod okunamadı!", "Hata", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
+    private void dugmeStili(JButton dugme) {
+        dugme.setBackground(new Color(50, 150, 250)); // Mavi arka plan
+        dugme.setForeground(Color.WHITE); // Beyaz yazı rengi
+        dugme.setFocusPainted(false); // Butona odaklanınca değişmemesi için
+        dugme.setContentAreaFilled(false); // İç dolguyu kapatır, rengin değişmesini engeller
+        dugme.setOpaque(true); // Arkaplanın sabit kalmasını sağlar
+        dugme.setBorderPainted(false); // Kenar çizgisini kaldırır
+        dugme.setFont(new Font("Arial", Font.BOLD, 16)); // Yazı tipi ve boyutu
+        dugme.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Kenar boşluğu ayarı
+    }
+
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new QRKoder().setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new QRKoder().setVisible(true));
     }
 }
