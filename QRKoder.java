@@ -37,11 +37,7 @@ public class QRKoder extends JFrame {
             public void focusLost(FocusEvent e) {
                 if (metinAlani.getText().isEmpty()) {
                     metinAlani.setText("Link veya metin giriniz");
-<<<<<<< HEAD
                     metinAlani.setForeground(Color.GRAY);
-=======
-                    metinAlani.setForeground(Color.BLACK);
->>>>>>> 457d4240af5a255cf930239816fbe95bce3e2956
                 }
             }
         });
